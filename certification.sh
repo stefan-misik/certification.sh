@@ -63,6 +63,7 @@ function gen_cert
     openssl req -new -key $keyname -out $filename       
 }
 
+# Sign certificate
 function sign
 {
     local rootkey="$ROOT_KEY"
@@ -103,6 +104,7 @@ function sign
     openssl x509 -req -in $incrt -CA $rootcrt -CAkey $rootkey -CAcreateserial -out $out -days $expiry
 }
 
+# Generate self-signed certificate
 function gen_ca
 {
     local rootkey="rsa.key"    
@@ -131,11 +133,46 @@ function gen_ca
     openssl req -x509 -new -nodes -key $rootkey -days $expiry -out $out
 }
 
+# Generate p12 certificate
+function gen_p12
+{
+    local key="rsa.key"  
+    local crt="in.crt"
+    local rootcrt="$ROOT_CRT"  
+    local out="out.p12"
+        
+    local defaultval
+    local input
+    
+    # Key
+    defaultval="$key";    
+    read -e -p "Enter input key file [$defaultval]: " input
+    key="${input:=$defaultval}"
+    
+    # Cert
+    defaultval="$crt";    
+    read -e -p "Enter input certificate file [$defaultval]: " input
+    crt="${input:=$defaultval}"
+    
+    # Rootcrt
+    defaultval="$rootcrt";    
+    read -e -p "Enter root certificate file [$defaultval]: " input
+    rootcrt="${input:=$defaultval}"
+    
+    # Output certificate    
+    defaultval="$out";    
+    read -e -p "Enter output certificate file name [$defaultval]: " input
+    out="${input:=$defaultval}"
+    
+    # Generate
+    openssl pkcs12 -export -out $out -inkey $key -in $crt -certfile $rootcrt
+}
+
 until false; do
     PS3="Please enter your choice: "
     select opt in "Generate Key"\
      "Generate Certificate" "Sign Certificate"\
-     "Generate Self-signed Certificate" "Exit"
+     "Generate Self-signed Certificate" "Generate p12 Certificate" "Exit"
     do
         case $opt in
             "Generate Key")
@@ -149,6 +186,9 @@ until false; do
                 ;;
             "Generate Self-signed Certificate")
                 gen_ca
+                ;;
+            "Generate p12 Certificate")
+                gen_p12
                 ;;
             "Exit")
                 exit
