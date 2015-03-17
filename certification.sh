@@ -138,7 +138,6 @@ function gen_p12
 {
     local key="rsa.key"  
     local crt="in.crt"
-    local rootcrt="$ROOT_CRT"  
     local out="out.p12"
         
     local defaultval
@@ -159,13 +158,9 @@ function gen_p12
     read -e -p "Enter root certificate file [$defaultval]: " input
     rootcrt="${input:=$defaultval}"
     
-    # Output certificate    
-    defaultval="$out";    
-    read -e -p "Enter output certificate file name [$defaultval]: " input
-    out="${input:=$defaultval}"
-    
+        
     # Generate
-    openssl pkcs12 -export -out $out -inkey $key -in $crt -certfile $rootcrt
+    openssl pkcs12 -export -out $out -inkey $key -in $crt
 }
 
 until false; do
