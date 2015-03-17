@@ -153,11 +153,10 @@ function gen_p12
     read -e -p "Enter input certificate file [$defaultval]: " input
     crt="${input:=$defaultval}"
     
-    # Rootcrt
-    defaultval="$rootcrt";    
-    read -e -p "Enter root certificate file [$defaultval]: " input
-    rootcrt="${input:=$defaultval}"
-    
+    # Output certificate   
+    defaultval="$out";    		
+    read -e -p "Enter output certificate file name [$defaultval]: " input		
+    out="${input:=$defaultval}" 
         
     # Generate
     openssl pkcs12 -export -out $out -inkey $key -in $crt
