@@ -6,6 +6,8 @@
 ROOT_KEY="/root/certs/rootCA.key"
 ROOT_CRT="/root/certs/rootCA.crt"
 
+SIGN_ALG=sha256
+
 # Generate Key
 function gen_key
 {
@@ -34,7 +36,7 @@ function gen_key
     # Create
     if [ "y" == "$pass" ]
     then
-        openssl genrsa -aes128 -passout stdin -out $filename $bitlen
+        openssl genrsa -aes256 -passout stdin -out $filename $bitlen
     else 
         openssl genrsa -out $filename $bitlen
     fi    
@@ -60,7 +62,7 @@ function gen_cert
     filename="${input:=$defaultval}"
     
     # Create
-    openssl req -new -key $keyname -out $filename       
+    openssl req -new -$SIGN_ALG -key $keyname -out $filename       
 }
 
 # Sign certificate
@@ -101,7 +103,7 @@ function sign
     expiry="${input:=$defaultval}"
     
     # Sign
-    openssl x509 -req -in $incrt -CA $rootcrt -CAkey $rootkey -CAcreateserial -out $out -days $expiry
+    openssl x509 -$SIGN_ALG -req -in $incrt -CA $rootcrt -CAkey $rootkey -CAcreateserial -out $out -days $expiry
 }
 
 # Generate self-signed certificate
@@ -130,7 +132,7 @@ function gen_ca
     expiry="${input:=$defaultval}"
 
     # Generate
-    openssl req -x509 -new -nodes -key $rootkey -days $expiry -out $out
+    openssl req -x509 -new -nodes -$SIGN_ALG -key $rootkey -days $expiry -out $out
 }
 
 # Generate p12 certificate
